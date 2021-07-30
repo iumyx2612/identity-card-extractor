@@ -131,3 +131,10 @@ dmypy.json
 # Data
 workspace/Data
 workspace/RawData
+
+# rar file
+*.rar
+
+# Object Detection API stuff
+models/
+protoc/
