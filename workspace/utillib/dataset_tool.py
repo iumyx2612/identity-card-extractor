@@ -14,6 +14,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'    # Suppress TensorFlow logging (1)
 
 
 def xml_to_csv(path):
+    """
+    function to convert all information in *.xml file (annotation file) to
+    a csv data format
+    :param path: path to folder contains annotation files
+    :return:
+    """
     xml_list = []
     for xml_file in os.listdir(path):
         try:
@@ -79,8 +85,6 @@ def create_tf_example(group, path, label_map_dict):
         ymins.append(row['ymin'] / height)
         ymaxs.append(row['ymax'] / height)
         classes_text.append(row['class'].encode('utf8'))
-        if row['class'] == 'ư':
-            print(filename)
         classes.append(class_text_to_int(label_map_dict, row['class']))
 
     tf_example = tf.train.Example(features=tf.train.Features(feature={
@@ -99,7 +103,17 @@ def create_tf_example(group, path, label_map_dict):
     }))
     return tf_example
 
-def create_tf_record(labels_path, out_path, image_dir, xml_dir, csv_path, debug=None):
+def create_tf_record(labels_path, out_path, image_dir, xml_dir, csv_path=None, debug=None):
+    """
+    Function to create tfrecord dataset from a csv file
+    :param labels_path: path to the label_map.pbtxt file
+    :param out_path: path to save your tfrecord file. The path must specify the name of tfrecord file
+    :param image_dir: path to folder contains image files
+    :param xml_dir: path to folder contains annotation files
+    :param csv_path: path to save your csv file. The path must specify the name of csv file
+    :param debug: pass in any value to go into debug mode
+    :return:
+    """
     label_map = label_map_util.load_labelmap(labels_path)
     label_map_dict = label_map_util.get_label_map_dict(label_map)
     writer = tf.python_io.TFRecordWriter(out_path)
