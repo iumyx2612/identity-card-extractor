@@ -79,6 +79,8 @@ def create_tf_example(group, path, label_map_dict):
         ymins.append(row['ymin'] / height)
         ymaxs.append(row['ymax'] / height)
         classes_text.append(row['class'].encode('utf8'))
+        if row['class'] == 'ư':
+            print(filename)
         classes.append(class_text_to_int(label_map_dict, row['class']))
 
     tf_example = tf.train.Example(features=tf.train.Features(feature={
@@ -97,7 +99,7 @@ def create_tf_example(group, path, label_map_dict):
     }))
     return tf_example
 
-def create_tf_record(labels_path, out_path, image_dir, xml_dir, csv_path):
+def create_tf_record(labels_path, out_path, image_dir, xml_dir, csv_path, debug=None):
     label_map = label_map_util.load_labelmap(labels_path)
     label_map_dict = label_map_util.get_label_map_dict(label_map)
     writer = tf.python_io.TFRecordWriter(out_path)
@@ -105,10 +107,14 @@ def create_tf_record(labels_path, out_path, image_dir, xml_dir, csv_path):
     examples = xml_to_csv(xml_dir)
     grouped = split(examples, 'filename')
     for idx, group in enumerate(grouped):
+        if debug:
+            if idx % 1 == 0:
+                print('On image %d of %d, file name: %s' %(idx + 1, len(grouped), group[0]))
+        else:
+            if idx % 100 == 0:
+                print('On image %d of %d' %(idx + 1, len(grouped)))
         tf_example = create_tf_example(group, path, label_map_dict)
         writer.write(tf_example.SerializeToString())
-        if idx % 100 == 0:
-            print('On image %d of %d' %(idx, len(grouped)))
     writer.close()
     print('Successfully created the TFRecord file: {}'.format(out_path))
     if csv_path is not None:
