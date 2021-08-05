@@ -4,7 +4,7 @@ import os
 import sys
 import shutil
 import re
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 from tqdm import tqdm
@@ -107,6 +107,7 @@ def inspect_annotation_with_image(image_path, annotation_path):
 
             draw = ImageDraw.Draw(image)
             draw.rectangle([xmin, ymin, xmax, ymax], width=2)
+            draw.text([xmin, ymin], "%s"%member.find("name").text)
         image.show()
 
 
